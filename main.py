@@ -32,7 +32,40 @@ class Quiz:
         return user_answer == self.answer
 
 
+def create_default_quizzes():
+    return [
+        Quiz(
+            "Python에서 값을 이름에 연결해 나중에 사용할 때 쓰는 것은?",
+            ["주석", "변수", "폴더", "커밋"],
+            2,
+        ),
+        Quiz(
+            "Python에서 정수를 나타내는 자료형은?",
+            ["str", "bool", "int", "list"],
+            3,
+        ),
+        Quiz(
+            "Python에서 조건에 따라 실행할 코드를 나눌 때 사용하는 것은?",
+            ["if / elif / else", "print", "input", "import"],
+            1,
+        ),
+        Quiz(
+            "Python에서 함수가 결과값을 호출한 곳으로 돌려줄 때 사용하는 것은?",
+            ["continue", "break", "pass", "return"],
+            4,
+        ),
+        Quiz(
+            "Git에서 준비된 변경 사항을 로컬 저장소의 이력으로 기록하는 명령은?",
+            ["git push", "git commit", "git clone", "git pull"],
+            2,
+        ),
+    ]
+
+
 class QuizGame:
+    def __init__(self):
+        self.quizzes = create_default_quizzes()
+
     def show_menu(self):
         print("\n========================================")
         print("       Python · Git 복습 퀴즈")
