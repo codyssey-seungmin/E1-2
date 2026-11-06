@@ -73,6 +73,7 @@ def create_default_quizzes():
 class QuizGame:
     def __init__(self):
         self.quizzes = create_default_quizzes()
+        self.best_score = None
 
     def show_menu(self):
         print("\n========================================")
@@ -107,6 +108,24 @@ class QuizGame:
 
         score = round(correct_count / total * 100)
         print(f"\n결과: {total}문제 중 {correct_count}문제 정답! ({score}점)")
+        if self.best_score is None or score > self.best_score["score"]:
+            self.best_score = {
+                "score": score,
+                "correct_count": correct_count,
+                "total": total,
+            }
+            print("새로운 최고 점수입니다!")
+
+    def show_score(self):
+        if self.best_score is None:
+            print("아직 퀴즈를 풀지 않았습니다.")
+            return
+
+        print(
+            f"\n최고 점수: {self.best_score['score']}점 "
+            f"({self.best_score['total']}문제 중 "
+            f"{self.best_score['correct_count']}문제 정답)"
+        )
 
     def add_quiz(self):
         print("\n새로운 퀴즈를 추가합니다.")
@@ -144,7 +163,7 @@ class QuizGame:
             elif choice == 3:
                 self.list_quizzes()
             elif choice == 4:
-                print("점수 확인 기능을 준비 중입니다.")
+                self.show_score()
             elif choice == 5:
                 print("퀴즈 게임을 종료합니다.")
                 break
