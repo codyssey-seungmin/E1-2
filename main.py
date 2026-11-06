@@ -17,6 +17,14 @@ def read_number(prompt, minimum, maximum):
         print(f"{minimum}~{maximum} 사이의 번호를 입력해주세요.")
 
 
+def read_text(prompt):
+    while True:
+        text = input(prompt).strip()
+        if text:
+            return text
+        print("내용을 입력해주세요.")
+
+
 class Quiz:
     def __init__(self, question, choices, answer):
         self.question = question
@@ -100,6 +108,19 @@ class QuizGame:
         score = round(correct_count / total * 100)
         print(f"\n결과: {total}문제 중 {correct_count}문제 정답! ({score}점)")
 
+    def add_quiz(self):
+        print("\n새로운 퀴즈를 추가합니다.")
+        question = read_text("문제를 입력하세요: ")
+        choices = []
+        for number in range(1, 5):
+            choice = read_text(f"선택지 {number}: ")
+            choices.append(choice)
+        answer = read_number("정답 번호 (1~4): ", 1, 4)
+
+        quiz = Quiz(question, choices, answer)
+        self.quizzes.append(quiz)
+        print(f"퀴즈가 추가되었습니다! (총 {len(self.quizzes)}개)")
+
     def run(self):
         while True:
             self.show_menu()
@@ -108,7 +129,7 @@ class QuizGame:
             if choice == 1:
                 self.play()
             elif choice == 2:
-                print("퀴즈 추가 기능을 준비 중입니다.")
+                self.add_quiz()
             elif choice == 3:
                 print("퀴즈 목록 기능을 준비 중입니다.")
             elif choice == 4:
