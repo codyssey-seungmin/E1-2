@@ -66,3 +66,5 @@ python main.py
 ## 실행 화면
 
 [개발 환경](docs/screenshots/01_environment.png) · [퀴즈 풀기](docs/screenshots/02_play.png) · [퀴즈 추가](docs/screenshots/03_add_quiz.png) · [퀴즈 목록](docs/screenshots/04_quiz_list.png) · [점수 확인](docs/screenshots/05_score.png)
+
+게임을 종료하려면 메뉴에서 5번을 선택하세요.
