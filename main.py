@@ -1,3 +1,10 @@
+import json
+from pathlib import Path
+
+
+STATE_PATH = Path(__file__).with_name("state.json")
+
+
 def read_number(prompt, minimum, maximum):
     while True:
         text = input(prompt).strip()
@@ -74,6 +81,57 @@ class QuizGame:
     def __init__(self):
         self.quizzes = create_default_quizzes()
         self.best_score = None
+        self.load_state()
+
+    def save_state(self):
+        data = {
+            "quizzes": [vars(quiz) for quiz in self.quizzes],
+            "best_score": self.best_score,
+        }
+        temp_path = STATE_PATH.with_suffix(".json.tmp")
+        try:
+            with temp_path.open("w", encoding="utf-8") as file:
+                json.dump(data, file, ensure_ascii=False, indent=2)
+            temp_path.replace(STATE_PATH)
+        except OSError as error:
+            print(f"파일을 저장하지 못했습니다: {error}")
+
+    def load_state(self):
+        try:
+            with STATE_PATH.open(encoding="utf-8") as file:
+                data = json.load(file)
+            if not isinstance(data["quizzes"], list):
+                raise ValueError
+            quizzes = []
+            for item in data["quizzes"]:
+                quiz = Quiz(**item)
+                if not isinstance(quiz.question, str) or not quiz.question.strip():
+                    raise ValueError
+                if not isinstance(quiz.choices, list) or len(quiz.choices) != 4:
+                    raise ValueError
+                if not all(isinstance(c, str) and c.strip() for c in quiz.choices):
+                    raise ValueError
+                if type(quiz.answer) is not int or not 1 <= quiz.answer <= 4:
+                    raise ValueError
+                quizzes.append(quiz)
+            best = data["best_score"]
+            if best is not None:
+                if not all(type(best[k]) is int for k in ("score", "correct_count", "total")):
+                    raise ValueError
+                if not (best["total"] > 0 and 0 <= best["correct_count"] <= best["total"]
+                        and 0 <= best["score"] <= 100):
+                    raise ValueError
+        except FileNotFoundError:
+            self.save_state()
+        except (ValueError, TypeError, KeyError):
+            print("저장 파일이 손상되어 기본 퀴즈로 초기화합니다.")
+            self.save_state()
+        except OSError as error:
+            print(f"저장 파일을 읽지 못했습니다: {error}")
+        else:
+            self.quizzes = quizzes
+            self.best_score = best
+            print(f"저장된 데이터를 불러왔습니다. (퀴즈 {len(quizzes)}개)")
 
     def show_menu(self):
         print("\n========================================")
@@ -115,6 +173,7 @@ class QuizGame:
                 "total": total,
             }
             print("새로운 최고 점수입니다!")
+            self.save_state()
 
     def show_score(self):
         if self.best_score is None:
@@ -138,6 +197,7 @@ class QuizGame:
 
         quiz = Quiz(question, choices, answer)
         self.quizzes.append(quiz)
+        self.save_state()
         print(f"퀴즈가 추가되었습니다! (총 {len(self.quizzes)}개)")
 
     def list_quizzes(self):
