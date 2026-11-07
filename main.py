@@ -82,9 +82,11 @@ class QuizGame:
     def __init__(self):
         self.quizzes = create_default_quizzes()
         self.best_score = None
+        self.save_pending = False
         self.load_state()
 
     def save_state(self):
+        self.save_pending = True
         data = {
             "quizzes": [vars(quiz) for quiz in self.quizzes],
             "best_score": self.best_score,
@@ -94,6 +96,7 @@ class QuizGame:
             with temp_path.open("w", encoding="utf-8") as file:
                 json.dump(data, file, ensure_ascii=False, indent=2)
             temp_path.replace(STATE_PATH)
+            self.save_pending = False
         except OSError as error:
             print(f"파일을 저장하지 못했습니다: {error}")
 
@@ -175,8 +178,8 @@ class QuizGame:
                 "correct_count": correct_count,
                 "total": total,
             }
-            print("새로운 최고 점수입니다!")
             self.save_state()
+            print("새로운 최고 점수입니다!")
 
     def show_score(self):
         if self.best_score is None:
@@ -238,3 +241,7 @@ if __name__ == "__main__":
         game.run()
     except (KeyboardInterrupt, EOFError):
         print("\n입력이 중단되어 퀴즈 게임을 종료합니다.")
+    finally:
+        if game.save_pending:
+            print("저장되지 않은 변경 사항을 다시 저장합니다.")
+            game.save_state()
